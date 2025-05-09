@@ -62,8 +62,6 @@ export default function Navbar({
           <div className="hidden md:flex items-center space-x-4">
             {showThemeToggle && (
               <Button
-                variant="ghost"
-                size="icon"
                 onClick={toggleTheme}
                 className="rounded-full"
                 aria-label="Toggle theme"
@@ -81,8 +79,6 @@ export default function Navbar({
           <div className="md:hidden flex items-center">
             {showThemeToggle && (
               <Button
-                variant="ghost"
-                size="icon"
                 onClick={toggleTheme}
                 className="mr-2 rounded-full"
                 aria-label="Toggle theme"
@@ -94,7 +90,7 @@ export default function Navbar({
                 )}
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={toggleMenu} aria-label="Toggle menu">
+            <Button onClick={toggleMenu} aria-label="Toggle menu">
               {isOpen ? (
                 <X className="h-6 w-6 text-neutral-700 dark:text-neutral-300" />
               ) : (
