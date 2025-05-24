@@ -126,3 +126,34 @@ export async function getPaperById(id: string): Promise<SearchResult> {
     throw error;
   }
 }
+
+
+interface ChatResponse {
+    message: string;
+    response: string;
+    status: "success" | "error";
+  }
+
+  export async function retrieveChat(query: string): Promise<ChatResponse> {
+    const url = `${API_BASE_URL}${API_PREFIX}/chat`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: query }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data: ChatResponse = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Chat API error:", error);
+      throw error;
+    }
+  }
