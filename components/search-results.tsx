@@ -69,9 +69,8 @@ export function SearchResults({ query }: { query: string }) {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center">
           <Skeleton className="h-6 w-48" />
-          <Skeleton className="h-6 w-32" />
         </div>
 
         {[1, 2, 3].map((i) => (
@@ -94,17 +93,6 @@ export function SearchResults({ query }: { query: string }) {
       <div className="flex justify-between items-center">
         <div className="text-sm text-gray-600">
           About <span className="font-medium">{resultsCount}</span> results ({searchTime.toFixed(2)} seconds)
-        </div>
-
-        <div className="flex items-center gap-3">
-          <label htmlFor="sort" className="text-sm text-gray-600">
-            Sort by:
-          </label>
-          <select id="sort" className="text-sm border rounded-md px-2 py-1" defaultValue="relevance">
-            <option value="relevance">Relevance</option>
-            <option value="date">Date (newest)</option>
-            <option value="citations">Citations</option>
-          </select>
         </div>
       </div>
 

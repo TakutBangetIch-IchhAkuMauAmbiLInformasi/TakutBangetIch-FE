@@ -2,17 +2,14 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { getAutocomplete } from "@/lib/api"
 
 export function SearchHero() {
   const [query, setQuery] = useState("")
-  const [suggestions, setSuggestions] = useState<string[]>([])
-  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
@@ -25,43 +22,16 @@ export function SearchHero() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setQuery(value)
-
-    // Clear suggestions if input is too short
-    if (!value || value.length < 3) {
-      setSuggestions([]);
-      return;
-    }
-    
-    // Fetch autocomplete suggestions
-    setLoading(true);
-    getAutocomplete(value)
-      .then((results) => {
-        setSuggestions(results);
-      })
-      .catch((err) => {
-        console.error("Autocomplete error:", err);
-        // Fallback to generated suggestions
-        const fallbackSuggestions = [
-          `${value} in machine learning`,
-          `${value} algorithms`,
-          `${value} research papers`,
-          `recent ${value} developments`,
-        ];
-        setSuggestions(fallbackSuggestions);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 py-12">
       <div className="w-full max-w-3xl text-center mb-8">
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl mb-4">
-          Academic Paper Search
+        <h1 className="text-4xl font-bold tracking-tight text-blue-600 sm:text-5xl md:text-6xl mb-4">
+          SkripsiGratis
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Discover breakthrough research papers with AI-powered insights
+          Find academic papers for your thesis for free
         </p>
       </div>
 
@@ -86,26 +56,6 @@ export function SearchHero() {
             </Button>
           </div>
         </form>
-
-        {suggestions.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200">
-            <ul className="py-1">
-              {suggestions.map((suggestion, index) => (
-                <li
-                  key={index}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-left"
-                  onClick={() => {
-                    setQuery(suggestion)
-                    setSuggestions([])
-                    router.push(`/search?q=${encodeURIComponent(suggestion)}`)
-                  }}
-                >
-                  {suggestion}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
 
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Button

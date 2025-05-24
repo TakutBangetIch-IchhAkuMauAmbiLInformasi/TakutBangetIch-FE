@@ -32,35 +32,7 @@ export async function searchPapers(query: SearchQuery): Promise<SearchResponse> 
   }
 }
 
-export async function getAutocomplete(prefix: string, limit: number = 5): Promise<string[]> {
-  const url = `${API_BASE_URL}${API_PREFIX}/autocomplete?prefix=${encodeURIComponent(prefix)}&limit=${limit}`;
-  
-  console.log("Autocomplete URL:", url);
-  
-  try {
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    console.log("Autocomplete raw response:", data);
-    
-    // Handle Elasticsearch suggestions format
-    if (data.suggest && data.suggest.title_suggest && data.suggest.title_suggest.length > 0) {
-      const options = data.suggest.title_suggest[0].options || [];
-      return options.map((option: any) => option.text);
-    }
-    
-    // Fallback for other response formats or empty results
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('Autocomplete API error:', error);
-    // Return mock suggestions during development to avoid breaking UI
-    return [`${prefix} example`, `${prefix} research`, `${prefix} paper`];
-  }
-}
+// Autocomplete functionality has been removed
 
 export async function getCategories(): Promise<string[]> {
   const url = `${API_BASE_URL}${API_PREFIX}/categories`;
@@ -127,6 +99,30 @@ export async function getPaperById(id: string): Promise<SearchResult> {
     return await response.json();
   } catch (error) {
     console.error('Paper fetch API error:', error);
+    throw error;
+  }
+}
+
+// Fetch summary for a query - separate from search for async usage
+export async function getQuerySummary(query: string): Promise<{summary: string}> {
+  const url = `${API_BASE_URL}${API_PREFIX}/summarize-query`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Summary API error:', error);
     throw error;
   }
 }
