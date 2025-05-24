@@ -1,0 +1,65 @@
+<html>
+<head>
+  <title>Favicon Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      margin: 20px auto;
+      display: block;
+    }
+    .instructions {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>SkripsiGratis Favicon Generator</h1>
+  <canvas id="favicon" width="64" height="64"></canvas>
+  <p>Right-click on the image above and select "Save image as..." to save the favicon.</p>
+  <p>Save it as favicon.ico in the public folder.</p>
+  
+  <div class="instructions">
+    <h2>Instructions:</h2>
+    <ol>
+      <li>Right-click on the favicon above and save it</li>
+      <li>Put it in the <code>public</code> folder of your Next.js app</li>
+      <li>The app's layout.tsx already has the proper link tag</li>
+    </ol>
+  </div>
+  
+  <script>
+    const canvas = document.getElementById('favicon');
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#22c55e'; // Green color
+    ctx.fillRect(0, 0, 64, 64);
+    
+    // Add a border radius to simulate rounded corners
+    const radius = 5;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(radius, radius, radius, Math.PI, 1.5 * Math.PI);
+    ctx.arc(64 - radius, radius, radius, 1.5 * Math.PI, 0);
+    ctx.arc(64 - radius, 64 - radius, radius, 0, 0.5 * Math.PI);
+    ctx.arc(radius, 64 - radius, radius, 0.5 * Math.PI, Math.PI);
+    ctx.closePath();
+    ctx.fillStyle = '#22c55e';
+    ctx.fill();
+    
+    // Text "S"
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 42px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('S', 32, 34);
+  </script>
+</body>
+</html>

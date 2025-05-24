@@ -1,0 +1,187 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Sparkles, RefreshCw, Copy, Check } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import ReactMarkdown from "react-markdown"
+
+interface AiInsightsCardProps {
+  paperId: string
+  isExpanded: boolean
+  onToggle: () => void
+}
+
+interface InsightsResponse {
+  paper_id: string
+  insights: string
+  generated_at: string
+}
+
+export function AiInsightsCard({ paperId, isExpanded, onToggle }: AiInsightsCardProps) {
+  const [insights, setInsights] = useState<string>("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>("")
+  const [copied, setCopied] = useState(false)
+
+  const generateInsights = async () => {
+    setLoading(true)
+    setError("")
+    
+    try {
+      const response = await fetch(`/api/paper/${paperId}/insights`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to generate insights: ${response.status}`)
+      }
+
+      const data: InsightsResponse = await response.json()
+      setInsights(data.insights)
+    } catch (err) {
+      console.error('Error generating insights:', err)
+      setError(err instanceof Error ? err.message : 'Failed to generate insights')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(insights)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
+    }
+  }
+
+  // Generate insights when the component first loads and is expanded
+  useEffect(() => {
+    if (isExpanded && !insights && !loading && !error) {
+      generateInsights()
+    }
+  }, [isExpanded, paperId])
+
+  return (
+    <Card className="border-blue-100">
+      <CardHeader
+        className="py-4 px-6 flex flex-row items-center justify-between cursor-pointer bg-blue-50/50"
+        onClick={onToggle}
+      >
+        <CardTitle className="text-lg font-medium flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-blue-500" />
+          AI Insights
+        </CardTitle>
+        <div className="flex items-center gap-2">
+          {isExpanded && insights && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1"
+              onClick={(e) => {
+                e.stopPropagation()
+                generateInsights()
+              }}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              <span className="text-xs">Refresh</span>
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+
+      {isExpanded && (
+        <CardContent className="px-6 py-4">
+          {loading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center gap-3">
+                <RefreshCw className="h-5 w-5 animate-spin text-blue-500" />
+                <span className="text-gray-600">Generating AI insights...</span>
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="text-center py-8">
+              <div className="text-red-600 mb-4">{error}</div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={generateInsights}
+                disabled={loading}
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Again
+              </Button>
+            </div>
+          )}
+
+          {insights && !loading && (
+            <div className="space-y-4">
+              <div className="prose max-w-none">
+                <ReactMarkdown
+                  components={{
+                    h1: ({ children }) => <h3 className="text-lg font-semibold text-gray-900 mb-2">{children}</h3>,
+                    h2: ({ children }) => <h4 className="text-base font-medium text-gray-900 mb-2">{children}</h4>,
+                    h3: ({ children }) => <h5 className="text-sm font-medium text-gray-900 mb-1">{children}</h5>,
+                    p: ({ children }) => <p className="text-gray-700 mb-3">{children}</p>,
+                    ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 mb-3">{children}</ul>,
+                    li: ({ children }) => <li className="text-gray-700">{children}</li>,
+                    strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                  }}
+                >
+                  {insights}
+                </ReactMarkdown>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div className="text-xs text-gray-500">
+                  Generated by AI based on paper content. This summary may not capture all nuances of the original research.
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1"
+                  onClick={copyToClipboard}
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-xs text-green-500">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4" />
+                      <span className="text-xs">Copy insights</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {!insights && !loading && !error && (
+            <div className="text-center py-8">
+              <Sparkles className="h-12 w-12 text-blue-300 mx-auto mb-4" />
+              <div className="text-gray-600 mb-4">Generate AI-powered insights for this paper</div>
+              <Button
+                variant="outline"
+                onClick={generateInsights}
+                className="gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                Generate Insights
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      )}
+    </Card>
+  )
+}
