@@ -3,9 +3,10 @@ import { Bookmark, Share2, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { SearchResult } from "@/types/search"
 
 interface PaperCardProps {
-  paper: any
+  paper: SearchResult
   query: string
 }
 
@@ -18,12 +19,17 @@ export function PaperCard({ paper, query }: PaperCardProps) {
     return text.replace(regex, '<em class="bg-yellow-100 not-italic">$1</em>')
   }
 
-  // Create highlighted versions of title and abstract
-  const highlightedTitle = highlightText(paper.title, query)
-  const highlightedAbstract = highlightText(paper.content.substring(0, 250) + "...", query)
+  // Use API highlights if available, otherwise highlight manually
+  const highlightedTitle = paper.highlights?.title 
+    ? paper.highlights.title[0]
+    : highlightText(paper.title, query);
+  
+  const highlightedAbstract = paper.highlights?.content 
+    ? paper.highlights.content[0] 
+    : highlightText(paper.content.substring(0, 250) + "...", query);
 
   // Format categories as badges
-  const categories = paper.metadata.categories.split(" ")
+  const categories = paper.metadata?.categories?.split(" ") || []
 
   return (
     <Card className="overflow-hidden hover:border-blue-200 transition-colors">
@@ -37,15 +43,17 @@ export function PaperCard({ paper, query }: PaperCardProps) {
                 dangerouslySetInnerHTML={{ __html: highlightedTitle }}
               />
             </Link>
-            <div className="text-sm text-gray-600">{paper.metadata.authors}</div>
+            <div className="text-sm text-gray-600">{paper.metadata?.authors || "Unknown Authors"}</div>
             <div className="flex flex-wrap gap-2 mt-2">
               {categories.map((category: string) => (
                 <Badge key={category} variant="outline" className="text-xs">
                   {category}
                 </Badge>
               ))}
-              <span className="text-xs text-gray-500">{paper.metadata.year}</span>
-              {paper.metadata.doi && (
+              {paper.metadata?.year && (
+                <span className="text-xs text-gray-500">{paper.metadata.year}</span>
+              )}
+              {paper.metadata?.doi && (
                 <a
                   href={`https://doi.org/${paper.metadata.doi}`}
                   target="_blank"

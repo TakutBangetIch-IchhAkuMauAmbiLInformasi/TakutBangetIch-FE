@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { getCategories } from "@/lib/api"
 
 export function SearchFilters() {
   const [expandedSections, setExpandedSections] = useState({
@@ -13,6 +14,47 @@ export function SearchFilters() {
     year: true,
     authors: false,
   })
+  const [categories, setCategories] = useState<{id: string, label: string}[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Fetch categories from API
+    setLoading(true)
+    getCategories()
+      .then((results) => {
+        // Convert the category IDs to objects with labels
+        const formattedCategories = results.map(cat => ({
+          id: cat,
+          label: getCategoryLabel(cat)
+        }))
+        setCategories(formattedCategories)
+      })
+      .catch((error) => {
+        console.error("Failed to fetch categories:", error)
+        // Fallback to default categories
+        setCategories(defaultCategories)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
+
+  // Helper function to convert category IDs to readable labels
+  const getCategoryLabel = (categoryId: string): string => {
+    const categoryMap: {[key: string]: string} = {
+      "cs.AI": "Artificial Intelligence",
+      "cs.CV": "Computer Vision",
+      "cs.LG": "Machine Learning",
+      "cs.CL": "Computation and Language",
+      "cs.NE": "Neural and Evolutionary Computing",
+      "cs.IR": "Information Retrieval",
+      "cs.HC": "Human-Computer Interaction",
+      "cs.SE": "Software Engineering",
+      // Add more mappings as needed
+    }
+    
+    return categoryMap[categoryId] || categoryId
+  }
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections({
@@ -21,7 +63,8 @@ export function SearchFilters() {
     })
   }
 
-  const csCategories = [
+  // Default categories as fallback
+  const defaultCategories = [
     { id: "cs.AI", label: "Artificial Intelligence" },
     { id: "cs.CV", label: "Computer Vision" },
     { id: "cs.LG", label: "Machine Learning" },
@@ -56,7 +99,15 @@ export function SearchFilters() {
         {expandedSections.categories && (
           <CardContent className="pt-0 px-4 pb-3">
             <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-              {csCategories.map((category) => (
+              {loading ? (
+                // Loading skeleton for categories
+                Array(5).fill(0).map((_, i) => (
+                  <div key={i} className="flex items-center space-x-2">
+                    <div className="h-4 w-4 rounded bg-gray-200 animate-pulse" />
+                    <div className="h-4 w-32 rounded bg-gray-200 animate-pulse" />
+                  </div>
+                ))
+              ) : categories.map((category) => (
                 <div key={category.id} className="flex items-center space-x-2">
                   <Checkbox id={category.id} />
                   <label
@@ -70,7 +121,7 @@ export function SearchFilters() {
               ))}
             </div>
 
-            {csCategories.length > 8 && (
+            {categories.length > 8 && (
               <Button variant="link" size="sm" className="mt-2 h-auto p-0 text-xs">
                 Show more categories
               </Button>

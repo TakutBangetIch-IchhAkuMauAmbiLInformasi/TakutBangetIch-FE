@@ -3,12 +3,14 @@ import { SearchFilters } from "@/components/search-filters"
 import { AiOverviewCard } from "@/components/ai-overview-card"
 import { SearchHeader } from "@/components/search-header"
 
-export default function SearchPage({
+export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: { q: string }
+  searchParams: { q?: string } | Promise<{ q?: string }>
 }) {
-  const query = searchParams.q || ""
+  // Await the searchParams to properly handle it as a promise
+  const resolvedParams = await searchParams;
+  const query = resolvedParams.q || ""
 
   return (
     <main className="min-h-screen bg-white">

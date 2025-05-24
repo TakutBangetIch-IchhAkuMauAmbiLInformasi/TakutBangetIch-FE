@@ -4,34 +4,66 @@ import { useState, useEffect } from "react"
 import { PaperCard } from "@/components/paper-card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { mockPapers } from "@/lib/mock-data"
+import { SearchQuery, SearchResult } from "@/types/search"
+import { searchPapers } from "@/lib/api"
 
 export function SearchResults({ query }: { query: string }) {
   const [loading, setLoading] = useState(true)
-  const [papers, setPapers] = useState<any[]>([])
+  const [papers, setPapers] = useState<SearchResult[]>([])
   const [resultsCount, setResultsCount] = useState(0)
   const [searchTime, setSearchTime] = useState(0)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate loading
-    setLoading(true)
+    if (!query || query.trim() === "") {
+      setPapers([]);
+      setResultsCount(0);
+      setLoading(false);
+      return;
+    }
 
-    const timer = setTimeout(() => {
-      // Filter mock papers based on query
-      const filteredPapers = mockPapers.filter(
-        (paper) =>
-          paper.title.toLowerCase().includes(query.toLowerCase()) ||
-          paper.metadata.authors.toLowerCase().includes(query.toLowerCase()) ||
-          paper.metadata.categories.toLowerCase().includes(query.toLowerCase()) ||
-          paper.content.toLowerCase().includes(query.toLowerCase()),
-      )
+    // Set loading state
+    setLoading(true);
+    setError(null);
+    
+    const startTime = Date.now();
 
-      setPapers(filteredPapers)
-      setResultsCount(filteredPapers.length)
-      setSearchTime(Math.random() * 0.5 + 0.1) // Random time between 0.1 and 0.6 seconds
-      setLoading(false)
-    }, 1000)
+    // Create search query object
+    const searchQuery: SearchQuery = {
+      query,
+      semantic_weight: 0.7,
+      text_weight: 0.3,
+      limit: 10,
+      offset: 0
+    };
 
-    return () => clearTimeout(timer)
+    // Log API URL to debug connection issues
+    console.log("API URL:", process.env.NEXT_PUBLIC_SEARCH_ENGINE_URL);
+    
+    // Fetch search results from API
+    searchPapers(searchQuery)
+      .then((response) => {
+        setPapers(response.results);
+        setResultsCount(response.total);
+        setSearchTime((Date.now() - startTime) / 1000);
+      })
+      .catch((err) => {
+        console.error("Search failed:", err);
+        setError("Failed to fetch search results. Please try again.");
+        // Fallback to mock data in case of error
+        const filteredPapers = mockPapers.filter(
+          (paper) =>
+            paper.title.toLowerCase().includes(query.toLowerCase()) ||
+            paper.metadata.authors.toLowerCase().includes(query.toLowerCase()) ||
+            paper.metadata.categories.toLowerCase().includes(query.toLowerCase()) ||
+            paper.content.toLowerCase().includes(query.toLowerCase()),
+        );
+        setPapers(filteredPapers);
+        setResultsCount(filteredPapers.length);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [query])
 
   if (loading) {

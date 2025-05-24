@@ -2,15 +2,17 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { getAutocomplete } from "@/lib/api"
 
 export function SearchHero() {
   const [query, setQuery] = useState("")
   const [suggestions, setSuggestions] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
@@ -24,18 +26,32 @@ export function SearchHero() {
     const value = e.target.value
     setQuery(value)
 
-    // Mock suggestions based on input
-    if (value.length > 2) {
-      const mockSuggestions = [
-        `${value} in machine learning`,
-        `${value} algorithms`,
-        `${value} research papers`,
-        `recent ${value} developments`,
-      ]
-      setSuggestions(mockSuggestions)
-    } else {
-      setSuggestions([])
+    // Clear suggestions if input is too short
+    if (!value || value.length < 3) {
+      setSuggestions([]);
+      return;
     }
+    
+    // Fetch autocomplete suggestions
+    setLoading(true);
+    getAutocomplete(value)
+      .then((results) => {
+        setSuggestions(results);
+      })
+      .catch((err) => {
+        console.error("Autocomplete error:", err);
+        // Fallback to generated suggestions
+        const fallbackSuggestions = [
+          `${value} in machine learning`,
+          `${value} algorithms`,
+          `${value} research papers`,
+          `recent ${value} developments`,
+        ];
+        setSuggestions(fallbackSuggestions);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   return (
