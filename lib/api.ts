@@ -1,6 +1,6 @@
 import { SearchQuery, SearchResponse, SearchResult } from "@/types/search";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_SEARCH_ENGINE_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_SEARCH_ENGINE_URL || 'http://localhost:8000';
 const API_PREFIX = '/api/v1';
 
 // Log the API base URL to debug configuration
@@ -85,6 +85,30 @@ export async function searchByDoi(doi: string): Promise<SearchResponse> {
   }
 }
 
+// Get AI-generated summary for a query
+export async function getQuerySummary(query: string): Promise<{ summary: string }> {
+  const url = `${API_BASE_URL}${API_PREFIX}/summarize-query`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Query summary API error:', error);
+    throw error;
+  }
+}
+
 // Fetch a specific paper by ID
 export async function getPaperById(id: string): Promise<SearchResult> {
   const url = `${API_BASE_URL}${API_PREFIX}/paper/${encodeURIComponent(id)}`;
@@ -99,30 +123,6 @@ export async function getPaperById(id: string): Promise<SearchResult> {
     return await response.json();
   } catch (error) {
     console.error('Paper fetch API error:', error);
-    throw error;
-  }
-}
-
-// Fetch summary for a query - separate from search for async usage
-export async function getQuerySummary(query: string): Promise<{summary: string}> {
-  const url = `${API_BASE_URL}${API_PREFIX}/summarize-query`;
-  
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ query }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Summary API error:', error);
     throw error;
   }
 }

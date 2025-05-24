@@ -15,9 +15,13 @@ export default async function SearchPage({
     <main className="min-h-screen bg-white">
       <SearchHeader query={query} />
       <div className="container mx-auto px-4 py-8">
-        <AiOverviewCard query={query} />
+        {/* AI Overview Card loads independently */}
+        <div className="mb-8">
+          <AiOverviewCard query={query} />
+        </div>
 
-        <div className="mt-8">
+        {/* Search Results load independently */}
+        <div>
           <SearchResults query={query} />
         </div>
       </div>

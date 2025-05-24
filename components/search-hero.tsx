@@ -66,27 +66,27 @@ export function SearchHero() {
               router.push(`/search?q=${encodeURIComponent("quantum computing latest developments")}`)
             }}
           >
-            Latest in quantum computing
+            Quantum computing
           </Button>
           <Button
             variant="outline"
             className="rounded-full text-sm"
             onClick={() => {
-              setQuery("machine learning healthcare")
+              setQuery("machine learning latest developments")
               router.push(`/search?q=${encodeURIComponent("machine learning healthcare")}`)
             }}
           >
-            ML in healthcare
+            Machine Learning
           </Button>
           <Button
             variant="outline"
             className="rounded-full text-sm"
             onClick={() => {
-              setQuery("climate change mitigation research")
+              setQuery("Deep Learning latest developments")
               router.push(`/search?q=${encodeURIComponent("climate change mitigation research")}`)
             }}
           >
-            Climate change research
+            Deep Learning
           </Button>
         </div>
       </div>

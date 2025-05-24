@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import ClientProvider from './providers'
 
 export const metadata: Metadata = {
   title: 'SkripsiGratis - Find Academic Papers for Free',
@@ -17,7 +18,11 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
-      <body>{children}</body>
+      <body>
+        <ClientProvider>
+          {children}
+        </ClientProvider>
+      </body>
     </html>
   )
 }

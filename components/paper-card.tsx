@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { Bookmark, Share2, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -86,22 +85,7 @@ export function PaperCard({ paper, query }: PaperCardProps) {
         )}
       </CardContent>
 
-      <CardFooter className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex justify-between">
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" className="h-8 gap-1">
-            <Bookmark className="h-4 w-4" />
-            <span className="text-xs">Save</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 gap-1">
-            <FileText className="h-4 w-4" />
-            <span className="text-xs">Cite</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 gap-1">
-            <Share2 className="h-4 w-4" />
-            <span className="text-xs">Share</span>
-          </Button>
-        </div>
-
+      <CardFooter className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
         <Link href={`/paper/${paper.id}`}>
           <Button size="sm" variant="outline" className="h-8">
             View Details

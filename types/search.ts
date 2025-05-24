@@ -14,11 +14,13 @@ export interface SearchResult {
   title: string;
   content: string;
   score: number;
+  passage?: string;
   metadata?: {
     authors: string;
     categories: string;
     year: string;
     doi?: string;
+    submitter?: string;
     [key: string]: any;
   };
   highlights?: {

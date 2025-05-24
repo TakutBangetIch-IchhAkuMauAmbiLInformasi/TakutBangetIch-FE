@@ -6,14 +6,17 @@ import Link from "next/link"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useSearch } from "@/lib/search-context"
 
 export function SearchHeader({ query }: { query: string }) {
   const [searchQuery, setSearchQuery] = useState(query || "")
   const router = useRouter()
+  const { updateSearchTimestamp } = useSearch()
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery?.trim()) {
+      updateSearchTimestamp() // Update the search timestamp
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
     }
   }
