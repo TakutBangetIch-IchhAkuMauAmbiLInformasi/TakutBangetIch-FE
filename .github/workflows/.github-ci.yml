@@ -6,9 +6,11 @@ on:
       - main
 
 env:
-  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/fetk:latest
-  NEXT_PUBLIC_API_URL: http://localhost:8080/api
-  NEXT_PUBLIC_SEARCH_ENGINE_URL: ${{ secrets.NEXT_PUBLIC_SEARCH_ENGINE_URL }}
+  IMAGE_NAME: yosefnuragaw/fetk:latest
+  NEXT_PUBLIC_API_URL: https://takutbangetich-be-production.up.railway.app
+  NEXT_PUBLIC_SEARCH_ENGINE_URL:  https://takutbangetich-be-production.up.railway.app
+  DOCKER_PASSWORD: 6mWc742W0SPXju0nC0vmvL6MK2w
+  DOCKER_USERNAME: yosefnuragaw
 
 jobs:
   docker-build:
