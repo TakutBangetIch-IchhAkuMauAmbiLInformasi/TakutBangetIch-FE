@@ -36,16 +36,7 @@ export default function ChatPage() {
           <ChatInterface addReferencedPaper={addReferencedPaper} selectedPapers={selectedPapers} />
         </div>
 
-        <div className="md:w-2/5">
-          <ReferencedPapers
-            papers={selectedPapers}
-            removePaper={removeReferencedPaper}
-            clearPapers={clearReferencedPapers}
-          />
-        </div>
       </div>
     </main>
   )
 }
-
-
