@@ -67,7 +67,7 @@ export function AiInsightsCard({ paperId, isExpanded, onToggle }: AiInsightsCard
       .replace(/^([A-Z][a-zA-Z\s&]+)$/gm, (match) => {
         // Only convert to header if it's a typical section title
         if (match.match(/^(Executive Summary|Key Findings|Methodology|Significance|Impact|Technical Innovation|Background|Results|Conclusion|Discussion|Future Work)$/)) {
-          return ## ${match}
+          return `##${match}`
         }
         return match
       })
